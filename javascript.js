@@ -7,7 +7,8 @@ var jogador1 = {
     y: 200,
     altura: 100,
     largura: 10,
-    pontos: 0
+    pontos: 0,
+    direcao: 0
 }
 
 var jogador2 = {
@@ -15,7 +16,8 @@ var jogador2 = {
     y: 200,
     altura: 100,
     largura: 10,
-    pontos: 0
+    pontos: 0,
+    direcao: 0
 }
 
 var bola = {
@@ -44,6 +46,8 @@ function colisaoBaixo() {
 function colisaoDireita() {
     if (bola.x >= canvas.width - bola.largura) {
         bola.dirX *= -1
+        bola.x = canvas.width / 2
+        bola.y = canvas.height / 2
         jogador1.pontos += 1
     }
 }
@@ -51,22 +55,26 @@ function colisaoDireita() {
 function colisaoEsquerda() {
     if (bola.x <= 0) {
         bola.dirX *= -1
+        bola.x = canvas.width / 2
+        bola.y = canvas.height / 2
         jogador2.pontos += 1
     }
 }
 
-function colisaoJogador1() {
+function colisaoJogador2() {
     // colisão da bolinha com o jogador 2
     if (
-        (bola.x + bola.largura) >= jogador2.x &&
-        bola.y >= jogador2.y &&
-        bola.y <= jogador2.y + jogador2.altura
+        (
+            (bola.x + bola.largura) >= jogador2.x &&
+            bola.y >= jogador2.y &&
+            bola.y <= jogador2.y + jogador2.altura
+        )
     ) {
         bola.dirX *= -1
     }
 }
 
-function colisaoJogador2() {
+function colisaoJogador1() {
     // colisão da bolinha com o jogador 1
     if (
         bola.x <= (jogador1.x + jogador1.largura) &&
@@ -80,12 +88,25 @@ function colisaoJogador2() {
 function moverBola() {
     bola.x += bola.dirX
     bola.y += bola.dirY
-    colisaoCima()
-    colisaoBaixo()
-    colisaoDireita()
-    colisaoEsquerda()
-    colisaoJogador1()
-    colisaoJogador2()
+}
+
+function moverJogador() {
+    // jogador 1
+    if (jogador1.y < 0) {
+        jogador1.y = 0
+    } else if (jogador1.y > canvas.height - jogador1.altura) {
+        jogador1.y = canvas.height - jogador1.altura
+    } else {
+        jogador1.y += jogador1.direcao
+    }
+    // jogador 2
+    if (jogador2.y < 0) {
+        jogador2.y = 0
+    } else if (jogador2.y > canvas.height - jogador2.altura) {
+        jogador2.y = canvas.height - jogador2.altura
+    } else {
+        jogador2.y += jogador2.direcao
+    }
 }
 
 function desenharNaTela() {
@@ -100,12 +121,55 @@ function desenharNaTela() {
     container.fillText("PONT0S: " + jogador1.pontos, 30, 30)
     container.fillText("PONTOS: " + jogador2.pontos, 680, 30)
     // bola info
-    container.fillText("X: " + bola.x + "dirX: " + bola.dirX, 320, 30)
-    if (pause == false) {
-        moverBola()
+    container.fillText("JY: " + jogador1.y, 320, 30)
+}
+
+function principal() {
+    desenharNaTela()
+    // colisões
+    colisaoCima()
+    colisaoBaixo()
+    colisaoDireita()
+    colisaoEsquerda()
+    colisaoJogador1()
+    colisaoJogador2()
+    // movimentos
+    moverBola()
+    moverJogador()
+
+}
+
+setInterval(principal, 1)
+
+function presscinouTecla(e) {
+    console.log("presscionou a tecla", e.key)
+    // jogador 1
+    if (e.key == "w") {
+        jogador1.direcao = -1
+    }
+    if (e.key == "s") {
+        jogador1.direcao = 1
+    }
+    // jogador 2
+    if (e.key == "ArrowUp") {
+        jogador2.direcao = -1
+    }
+    if (e.key == "ArrowDown") {
+        jogador2.direcao = 1
     }
 }
 
-setInterval(desenharNaTela, 1)
+function soltouTecla(e) {
+    console.log("soltou a tecla", e.key)
+    // jogador 1
+    if (e.key == "w" || e.key == "s") {
+        jogador1.direcao = 0
+    }
+    // jogador 2
+    if (e.key == "ArrowUp" || e.key == "ArrowDown") {
+        jogador2.direcao = 0
+    }
+}
 
-document.addEventListener("keydown", function (e) { })
+document.addEventListener("keydown", presscinouTecla)
+document.addEventListener("keyup", soltouTecla)
