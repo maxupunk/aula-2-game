@@ -63,12 +63,9 @@ function colisaoEsquerda() {
 
 function colisaoJogador2() {
     // colisão da bolinha com o jogador 2
-    if (
-        (
-            (bola.x + bola.largura) >= jogador2.x &&
-            bola.y >= jogador2.y &&
-            bola.y <= jogador2.y + jogador2.altura
-        )
+    if ((bola.x + bola.largura) >= jogador2.x &&
+        bola.y >= jogador2.y &&
+        bola.y <= jogador2.y + jogador2.altura
     ) {
         bola.dirX *= -1
     }
